@@ -98,7 +98,9 @@ func main () {
 
 	user := ninep.OsUsers.Uname2User(os.Getenv("USER"))
 
-	if err := mergeErrs(errSrc, errDst, errListen); err != nil {
+	if user == nil { // this seems to be a possibilty. Docs don't say much
+		fmt.Fprintf(os.Stderr, "Couldn't resolve user : %s\n", os.Getenv("USER"))
+	} else if err := mergeErrs(errSrc, errDst, errListen); err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	} else {
