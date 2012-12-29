@@ -83,7 +83,7 @@ func mergeErrs(errs ...error) error {
 // returns an error if the string is not of the above form, otherwise
 // err will be nil.
 func splitNetAddr(addr string) (netPart, addrPart string, err error) {
-	strs := strings.SplitN(addr, "!", 1)
+	strs := strings.SplitN(addr, "!", 2)
 	if len(strs) != 2 {
 		return "", "", fmt.Errorf("Invalid filesystem address : %s\n", addr)
 	}
