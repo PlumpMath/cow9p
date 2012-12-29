@@ -3,6 +3,7 @@ package main
 import (
 	"code.google.com/p/go9p/p/clnt"
 	"code.google.com/p/go9p/p/srv"
+	ninep "code.google.com/p/go9p/p"
 	"flag"
 	"fmt"
 	"os"
@@ -40,12 +41,15 @@ func (fs *CowFS) Serve(net, addr string) {
 // Given the networks & addresses of the source and destination filesystems,
 // this will connect to them and return a *CowFS ready to use them. (or an
 // error)
-func Mount(netSrc, addrSrc, netDst, addrDst string) (*CowFS, error) {
-	src, err := clnt.Mount(netSrc, addrSrc, /* TODO: need to provide aname/user. */)
+func Mount(netSrc, addrSrc, netDst, addrDst string, user ninep.User) (*CowFS, error) {
+	// the empty string here (and below) is the aname - which subtree to
+	// connect to. right now we're just punting on providing a nice interface
+	// to this. you get the whole tree.
+	src, err := clnt.Mount(netSrc, addrSrc, "", user)
 	if(err != nil) {
 		return nil, fmt.Errorf("Error connecting to source fs : %s\n", err)
 	}
-	dst, err := clnt.Mount(netDst, addrDst, /* TODO: need to provide aname/user. */)
+	dst, err := clnt.Mount(netDst, addrDst, "", user)
 	if(err != nil) {
 		src.Unmount()
 		return nil, fmt.Errorf("Error connecting to destination fs : %s\n", err)
@@ -92,11 +96,13 @@ func main () {
 	netDst, addrDst, errDst := splitNetAddr(*dstAddr)
 	netListen, addrListen, errListen := splitNetAddr(*listenAddr)
 
+	user := ninep.OsUsers.Uname2User(os.Getenv("USER"))
+
 	if err := mergeErrs(errSrc, errDst, errListen); err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	} else {
-		fs, err := Mount(netSrc, addrSrc, netDst, addrDst)
+		fs, err := Mount(netSrc, addrSrc, netDst, addrDst, user)
 		if err != nil {
 			fmt.Fprint(os.Stderr, err)
 			os.Exit(1)

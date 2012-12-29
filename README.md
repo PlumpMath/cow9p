@@ -17,8 +17,8 @@ on src directly.
 
 ## Status
 
-Work in progress. Idea is well defined, but it doesn't work yet. Heck, it
-doesn't even build. The interfaces are not considered stable either.
+Work in progress. Idea is well defined, but it doesn't work yet. The
+interfaces are not considered stable either.
 
 Use at your own risk.
 
