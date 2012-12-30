@@ -7,6 +7,7 @@ import (
 	"flag"
 	"fmt"
 	"os"
+	"os/user"
 	"strings"
 )
 
@@ -15,6 +16,31 @@ var (
 	dstAddr = flag.String("d", "<none>", "Destination filesystem")
 	listenAddr = flag.String("addr", "tcp!:5640", "Listen address")
 )
+
+// clnt.Mount wants a user, let's wrap os/user's notion and give it the right
+// methods.
+type User struct {
+	raw *user.User
+}
+
+func (u *User) Name() string {
+	return u.raw.Username
+}
+
+func (u *User) Id() int {
+	// FIXME: PUNT
+	return 100
+}
+
+func (u *User) Groups() []ninep.Group {
+	// FIXME: PUNT
+	return nil
+}
+
+func (u *User) IsMember(g ninep.Group) bool {
+	// FIXME: PUNT (related to above)
+	return false
+}
 
 // The core data structure for cow9p. This essentially *is* the server.
 type CowFS struct {
@@ -92,19 +118,18 @@ func splitNetAddr(addr string) (netPart, addrPart string, err error) {
 
 func main () {
 	flag.Parse()
+
 	netSrc, addrSrc, errSrc := splitNetAddr(*srcAddr)
 	netDst, addrDst, errDst := splitNetAddr(*dstAddr)
 	netListen, addrListen, errListen := splitNetAddr(*listenAddr)
 
-	user := ninep.OsUsers.Uname2User(os.Getenv("USER"))
+	osUser, userErr := user.Current()
 
-	if user == nil { // this seems to be a possibilty. Docs don't say much
-		fmt.Fprintf(os.Stderr, "Couldn't resolve user : %s\n", os.Getenv("USER"))
-	} else if err := mergeErrs(errSrc, errDst, errListen); err != nil {
+	if err := mergeErrs(errSrc, errDst, errListen, userErr); err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	} else {
-		fs, err := Mount(netSrc, addrSrc, netDst, addrDst, user)
+		fs, err := Mount(netSrc, addrSrc, netDst, addrDst, &User{osUser})
 		if err != nil {
 			fmt.Fprint(os.Stderr, err)
 			os.Exit(1)
