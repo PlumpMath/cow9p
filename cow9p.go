@@ -1,9 +1,9 @@
 package main
 
 import (
+	ninep "code.google.com/p/go9p/p"
 	"code.google.com/p/go9p/p/clnt"
 	"code.google.com/p/go9p/p/srv"
-	ninep "code.google.com/p/go9p/p"
 	"flag"
 	"fmt"
 	"os"
@@ -12,8 +12,8 @@ import (
 )
 
 var (
-	srcAddr = flag.String("s", "<none>", "Source filesystem")
-	dstAddr = flag.String("d", "<none>", "Destination filesystem")
+	srcAddr    = flag.String("s", "<none>", "Source filesystem")
+	dstAddr    = flag.String("d", "<none>", "Destination filesystem")
 	listenAddr = flag.String("addr", "tcp!:5640", "Listen address")
 )
 
@@ -54,12 +54,12 @@ type CowFS struct {
 // net and addr are the network and address on which to listen.
 func (fs *CowFS) Serve(net, addr string) {
 	reqin := make(chan *srv.Req)
-	sv := srv.Srv{ Reqin: reqin }
+	sv := srv.Srv{Reqin: reqin}
 	sv.StartNetListener(net, addr)
 	for {
 		req := <-reqin
 		switch req.Tc.Type {
-			// TODO: actually handle messages
+		// TODO: actually handle messages
 		}
 	}
 }
@@ -72,11 +72,11 @@ func Mount(netSrc, addrSrc, netDst, addrDst string, user ninep.User) (*CowFS, er
 	// connect to. right now we're just punting on providing a nice interface
 	// to this. you get the whole tree.
 	src, err := clnt.Mount(netSrc, addrSrc, "", user)
-	if(err != nil) {
+	if err != nil {
 		return nil, fmt.Errorf("Error connecting to source fs : %s\n", err)
 	}
 	dst, err := clnt.Mount(netDst, addrDst, "", user)
-	if(err != nil) {
+	if err != nil {
 		src.Unmount()
 		return nil, fmt.Errorf("Error connecting to destination fs : %s\n", err)
 	}
@@ -116,7 +116,7 @@ func splitNetAddr(addr string) (netPart, addrPart string, err error) {
 	return strs[0], strs[1], nil
 }
 
-func main () {
+func main() {
 	flag.Parse()
 
 	netSrc, addrSrc, errSrc := splitNetAddr(*srcAddr)
