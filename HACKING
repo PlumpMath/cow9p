@@ -1,0 +1,29 @@
+A few notes regarding working with the source tree:
+
+ - run everything through gofmt before committing.
+ - Sometimes it makes sense to punt on doing a particular thing properly in
+   order to not get sidetracked. (I've learned this the hard way.) This is
+   okay, but DO NOT let it get into a release. If you know you're being lazy
+   about something, or deferring stuff that matters until later, document it.
+   I use the following to make sure I don't forget stuff like this:
+
+   - If an expected piece of functionality is outright missing, write a comment,
+     which should include the string TODO somewhere
+
+   - If something is broken, i.e. it doesn't work under some circumstances (Or
+     you think it *might* not), use FIXME.
+
+   Nothing goes in a release with one of these tags. In general, I won't pull
+   code that has these in HEAD from others. I'm fine with them being in the
+   history, but clean up your mess before giving it to me. (You'll notice that
+   I have my own mess sometimes, too. when we actually have a release
+   proceedure I'll make sure to keep my awful hacks away from it as well.)
+
+ - Wherever possible, don't write subtle code. Where it isn't possible,
+   document the subtlety clearly. If this results in a lot of comments, your
+   code is too subtle.
+
+ - It should not be possible for a reasonable person to have to guess as to
+   what you were getting at when writing something. commit messages are a good
+   place to document higher level "This is what I was trying to do and here's
+   where I'm going with it."
