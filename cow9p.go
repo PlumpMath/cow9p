@@ -28,17 +28,19 @@ func (u *User) Name() string {
 }
 
 func (u *User) Id() int {
-	// FIXME: PUNT
+	// FIXME: This is not a reasonable solution. I'm kinda
+	// punting on the whole user/auth thing for the moment;
+	// will have to deal with it eventually.
 	return 100
 }
 
 func (u *User) Groups() []ninep.Group {
-	// FIXME: PUNT
+	// FIXME: see above
 	return nil
 }
 
 func (u *User) IsMember(g ninep.Group) bool {
-	// FIXME: PUNT (related to above)
+	// FIXME: see above
 	return false
 }
 
